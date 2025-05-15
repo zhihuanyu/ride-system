@@ -16,6 +16,7 @@ jobs:
     permissions:
       contents: read
       packages: write
+      id-token: write  # Needed for GitHub OIDC
 
     steps:
       - name: Checkout repository
@@ -34,6 +35,17 @@ jobs:
           registry: ${{ env.REGISTRY }}
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Check if package exists
+        id: check-package
+        run: |
+          PACKAGE_NAME=$(echo ${{ env.IMAGE_NAME }} | tr '/' '-')
+          if curl -s -f -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+             "https://ghcr.io/v2/${{ env.IMAGE_NAME }}/tags/list" > /dev/null; then
+            echo "Package exists"
+          else
+            echo "Package does not exist, will be created"
+          fi
 
       - name: Extract metadata (tags, labels) for Docker
         id: meta
@@ -55,4 +67,6 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
-          platforms: linux/amd64 
+          platforms: linux/amd64
+          provenance: true
+          sbom: true 
