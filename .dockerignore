@@ -1,0 +1,26 @@
+# Git
+.git
+.gitignore
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+.pytest_cache/
+.coverage
+
+# VS Code
+.vscode/
+
+# Docker
+Dockerfile
+.dockerignore
+
+# Environment
+.env
+.venv
+env/
+venv/
+ENV/ 
